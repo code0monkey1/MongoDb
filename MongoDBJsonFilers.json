@@ -1,0 +1,5 @@
+// equality filer 
+{'end station name': '2 Ave & E 31 St'} // this will search all end station names that have value 2 Ave & E 30 St
+{"birth year": {"$gte": 1985,"$lt": 1990}}
+// This range filer gives a count of all the birth years(key) from the range of 1985 to 1990
+// here gte : means greater than and lt : means less than
