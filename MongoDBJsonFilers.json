@@ -3,3 +3,4 @@
 {"birth year": {"$gte": 1985,"$lt": 1990}}
 // This range filer gives a count of all the birth years(key) from the range of 1985 to 1990
 // here gte : means greater than and lt : means less than
+{"age": {"$gte": 21, "$lt": 70}} // To Find all documents for which the age field has a value that is >= 21 and < 70.
