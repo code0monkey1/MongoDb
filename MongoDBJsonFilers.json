@@ -8,3 +8,19 @@
 // inside modngoDB shell
 
 db.movies.find().pretty() // this will show all the json values in teh movies dataBase in a known ( altlas ) format 
+
+MongoDB Enterprise > db.names.insertOne({"This is a json object":"and it can storey anything" , "I mean anything":1223}) // To insert a new record 
+                                                                                                                         //  key:value pair
+{
+        "acknowledged" : true,                                     // This is the acknowlegement recieved after you insert the element 
+        "insertedId" : ObjectId("5bcef9a96282dc933a64bd7a")
+}
+MongoDB Enterprise > db.names.find().pretty()
+
+{ "_id" : ObjectId("5bcde4d33668e58e7fd02d3d"), "Chiranjeev" : "Thomas" }  //The object you stored , in the BSON format . A unique ID is supplied automatically
+                                                                           // automatically to every document 
+{
+        "_id" : ObjectId("5bcef9a96282dc933a64bd7a"),
+        "This is a json object" : "and it can storey anything",
+        "I mean anything" : 1223
+}
