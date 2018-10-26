@@ -8,13 +8,58 @@
 // inside modngoDB shell
 
 db.movies.find().pretty() // this will show all the json values in teh movies dataBase in a known ( altlas ) format 
-
+---------------------------------------
+//Mongo DB updating values 
 MongoDB Enterprise > db.names.insertOne({"This is a json object":"and it can storey anything" , "I mean anything":1223}) // To insert a new record 
                                                                                                                          //  key:value pair
 {
         "acknowledged" : true,                                     // This is the acknowlegement recieved after you insert the element 
         "insertedId" : ObjectId("5bcef9a96282dc933a64bd7a")
 }
+
+
+// Insert Many 
+db.MovieScratch.insertMany(
+    [
+        {
+	    "_id" : "tt0084726",
+	    "title" : "Star Trek II: The Wrath of Khan",
+	    "year" : 1982,
+	    "type" : "movie"
+        },
+        {
+	    "_id" : "tt0796366",
+	    "title" : "Star Trek",
+	    "year" : 2009,
+	    "type" : "movie"
+        },
+        {
+	    "_id" : "tt0084726",
+	    "title" : "Star Trek II: The Wrath of Khan",
+	    "year" : 1982,
+	    "type" : "movie"
+        },
+        {
+	    "_id" : "tt1408101",
+	    "title" : "Star Trek Into Darkness",
+	    "year" : 2013,
+	    "type" : "movie"
+        },
+        {
+	    "_id" : "tt0117731",
+	    "title" : "Star Trek: First Contact",
+	    "year" : 1996,
+	    "type" : "movie"
+        }
+    ],
+    {
+        "ordered": false 
+    }
+);
+ // the order can either be false , or be missing ... if it's missing, no more recoreds will be written after the 1st entry error is encountered 
+ // if the ordered field is marked as false , all valid entries will be entered , and the invalid once will be not entred , but the entereing will not 
+ // be stopped as it earlier did , when the first invalid entry was encountered .
+--------------------------------------
 MongoDB Enterprise > db.names.find().pretty()
 
 { "_id" : ObjectId("5bcde4d33668e58e7fd02d3d"), "Chiranjeev" : "Thomas" }  //The object you stored , in the BSON format . A unique ID is supplied automatically
@@ -23,4 +68,16 @@ MongoDB Enterprise > db.names.find().pretty()
         "_id" : ObjectId("5bcef9a96282dc933a64bd7a"),
         "This is a json object" : "and it can storey anything",
         "I mean anything" : 1223
+
+        ///////////////////
 }
+---------------------------------------------------------
+MongoDB Enterprise > db.names.find({"I mean anything":1223})  // This finds  all the documents that match the value for the given key 
+{ "_id" : ObjectId("5bcef9a96282dc933a64bd7a"), "This is a json object" : "and it can storey anything", "I mean anything" : 1223 }
+
+// the return value that you get after the find operation is called a cursor object  
+
+---------------------------------------------------------
+
+
+
