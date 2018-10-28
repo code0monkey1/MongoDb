@@ -12,72 +12,302 @@ db.movies.find().pretty() // this will show all the json values in teh movies da
 //Mongo DB updating values 
 MongoDB Enterprise > db.names.insertOne({"This is a json object":"and it can storey anything" , "I mean anything":1223}) // To insert a new record 
                                                                                                                          //  key:value pair
-{
+                                                                                                                         {
         "acknowledged" : true,                                     // This is the acknowlegement recieved after you insert the element 
         "insertedId" : ObjectId("5bcef9a96282dc933a64bd7a")
-}
+    }
 
 
 // Insert Many 
 db.MovieScratch.insertMany(
-    [
-        {
-	    "_id" : "tt0084726",
-	    "title" : "Star Trek II: The Wrath of Khan",
-	    "year" : 1982,
-	    "type" : "movie"
-        },
-        {
-	    "_id" : "tt0796366",
-	    "title" : "Star Trek",
-	    "year" : 2009,
-	    "type" : "movie"
-        },
-        {
-	    "_id" : "tt0084726",
-	    "title" : "Star Trek II: The Wrath of Khan",
-	    "year" : 1982,
-	    "type" : "movie"
-        },
-        {
-	    "_id" : "tt1408101",
-	    "title" : "Star Trek Into Darkness",
-	    "year" : 2013,
-	    "type" : "movie"
-        },
-        {
-	    "_id" : "tt0117731",
-	    "title" : "Star Trek: First Contact",
-	    "year" : 1996,
-	    "type" : "movie"
-        }
-    ],
-    {
-        "ordered": false 
-    }
-);
+	[
+		{
+			"_id" : "tt0084726",
+			"title" : "Star Trek II: The Wrath of Khan",
+			"year" : 1982,
+			"type" : "movie"
+		},
+		{
+			"_id" : "tt0796366",
+			"title" : "Star Trek",
+			"year" : 2009,
+			"type" : "movie"
+		},
+		{
+			"_id" : "tt0084726",
+			"title" : "Star Trek II: The Wrath of Khan",
+			"year" : 1982,
+			"type" : "movie"
+		},
+		{
+			"_id" : "tt1408101",
+			"title" : "Star Trek Into Darkness",
+			"year" : 2013,
+			"type" : "movie"
+		},
+		{
+			"_id" : "tt0117731",
+			"title" : "Star Trek: First Contact",
+			"year" : 1996,
+			"type" : "movie"
+		}
+	],
+	{
+		"ordered": false 
+	}
+	);
  // the order can either be false , or be missing ... if it's missing, no more recoreds will be written after the 1st entry error is encountered 
  // if the ordered field is marked as false , all valid entries will be entered , and the invalid once will be not entred , but the entereing will not 
  // be stopped as it earlier did , when the first invalid entry was encountered .
---------------------------------------
-MongoDB Enterprise > db.names.find().pretty()
+ --------------------------------------
+ MongoDB Enterprise > db.names.find().pretty()
 
 { "_id" : ObjectId("5bcde4d33668e58e7fd02d3d"), "Chiranjeev" : "Thomas" }  //The object you stored , in the BSON format . A unique ID is supplied automatically
                                                                            // automatically to every document 
-{
-        "_id" : ObjectId("5bcef9a96282dc933a64bd7a"),
-        "This is a json object" : "and it can storey anything",
-        "I mean anything" : 1223
+                                                                           {
+                                                                           	"_id" : ObjectId("5bcef9a96282dc933a64bd7a"),
+                                                                           	"This is a json object" : "and it can storey anything",
+                                                                           	"I mean anything" : 1223
 
         ///////////////////
-}
----------------------------------------------------------
+    }
+    ---------------------------------------------------------
 MongoDB Enterprise > db.names.find({"I mean anything":1223})  // This finds  all the documents that match the value for the given key 
 { "_id" : ObjectId("5bcef9a96282dc933a64bd7a"), "This is a json object" : "and it can storey anything", "I mean anything" : 1223 }
 
 // the return value that you get after the find operation is called a cursor object  
 
 ---------------------------------------------------------
+// Exmaple of a query inside a field of an object (wild) having field  a field (type)
+{"wind.type":"C"}
+// Exmaple of a query inside a wind object , inside a direction object , having a field angle 
+{"wind.direction.angle": 290}
+-------------------------------------------------
+//Reading Documents: Array Fields ( Read operations on Arrays )
+
+ // Equalit matches on array's can be done based on the 
+ // 1>entire array
+ // 2>based on the values in a specific element of an array 
+ // 3>based on the positon of the values in the array 
+
+ //example of 1 :
+ db.movies.find({"cast":["jeff bridges","tim robbins"] }) // this will show only those documents where the array's cast field
+ // with exactly 2 elements i.e the names searched before and in that exact order (i.e jeff before time ) ... 
+ 
+ //example of 2 :
+  db.movies.find({"cast":"jeff bridges" }) // This will show all documents where jeff was one of the cast members 
+  // so the cast can be any number , but the searched name should be one of them
+
+  //example of 3:
+  db.movies.find({"cast.0":"Jeff Bridges"}) // this will show all doc's where Jeff is in the first position of cast field 
+
+  ///////////
+  Q >How many documents list just two writers: "Ethan Coen" and "Joel Coen", in that order?
+
+  Ans > 
+  In the shell, assuming you've loaded movieDetails into the video database and assuming you are connected to your Atlas sandbox cluster, you can issue the following query.
+
+  db.movieDetails.find({writers: ["Ethan Coen", "Joel Coen"]}).count()
+  In Compass you can use the following filter in the Documents tab for the movieDetails collection.
+
+  {writers: ["Ethan Coen", "Joel Coen"]}
+
+  ----------------------------------------
+  Q> How to iterate through an entire record of search results after issuing the find() method ? 
+
+  Ans > 
+
+  The find() query always return a CURSOR ( a pointer to the position of the resuts ) to the client ( sleel / compass or whatever ).
+  In cases that there are multiple resuts in the query , the resuts are sent as records 
+
+  At one go , the cursor of the records interates and shows 20 docs at once .
+  Typing IT gets one the next 20 results ... the cursor iterates throug the next 20 results in that case 
+  we can continue to do this until we exhaust the resutls 
+
+  -----------------------
+
+  Q> What is the role of projections ? 
+
+  Ans > They let us limit the number of fields that are returned as a result of the find() query 
+
+  you use 1 ( to include a fild ) and you use 0 ( to exculde a field ) .. This has the effect of reducing network overhead 
+  and processing requirements , as there is not less data to process and trashfer 
+
+  The projection is supplied as the 2nd argument to the find () argument
+
+eg. db.movies.find({"genre":"Action,Adventure"},{title:1}) // this will return only the title along with the _id ( the _id is included by default )
+
+   db.movies.find({"genre":"Action"},{title:0}) // this will show all other fields except the title field 
+
+ // updating documents 
+
+// 1 . Update One 
+//This is used to update the 1st returned value of a query with the desired update values
 
 
+here we are adding a poster field 
 
+db.movieDetails.updateOne({
+title:"The Martian" // this is the filter value 
+},{                 // this will find the movie with the titla
+	$set:{ // This specifies how you want to update the doc
+		    // set takes one or more fiels that have to be updated 
+		    // if the field values already exist , they are updated,
+		    // else new feild with the value are added 
+
+		poster :"http://poster_address" // this adds a field poster with value url 
+	}
+}
+
+})
+
+Result : 
+{"acknowleged" : true, "matchedCount" :1 , "modifiedCount" :1}
+ //this shows that the update was achieved and the number 
+ //of documents that matched the find criteria specified 
+ //and finally the count of the doc's that were modified 
+
+ db.movieDetails.updateOne({
+title:"The Martian" // this is the filter value 
+},{                 // this will find the movie with the titla
+	$set:{ // This specifies how you want to update the doc
+		    // set takes one or more fiels that have to be updated 
+		    // if the field values already exist , they are updated,
+		    // else new feild with the value are added 
+
+		"awards" :{   // this updates an  fild awards with
+			          //  a document type with the given values of different fields 
+			          "wins":8,
+			          "nominations":14,
+			          "text":"Nominated for 3 Golden Globes"
+			      }
+			  }
+
+			});
+// Various update methods can be found in the below mentioned web page
+//https://docs.mongodb.com/manual/reference/operator/update/
+
+// using the inc operator to update 
+
+db.movieDetails.updateOne({
+	"title": "The Martian " // finds all doc's having this moview title 
+},{
+	$inc: {  // this will increment the values of the fields mentioned 
+		"tomato.reviews":3, // this increases the already present tomato.reviews field by 3
+		"tomato.userReviews":25 // same operation as above
+	}
+});
+----------------------
+// updating array values 
+
+eg. addToSet  ( only updates values if the values are not alreay present)
+//https://docs.mongodb.com/manual/reference/operator/update/
+
+db.movieDetails.updateOne({
+	"title": "The Martian"
+},{        
+	$push: { // this will create a new array called review add 1 element ( object / document ) with the fields/values
+		reviews : {
+			rating: 4.5,
+			date: ISODate ("2016-01-12T09:00:00Z"),
+			reviewer :"Spencer H.",
+			text : "myText"
+		}
+	}
+})
+
+////////////////
+// using each along with push : To add records to the array, such that each inseted record 
+// is taken in as a unique eliment and not added as a single object we use each operator along with push  
+db.movieDetails.updateOne({
+	"title": "The Martian"
+},{  
+	$push:{
+		reviews:{
+			$each: [
+				{
+					rating :0.4,
+					date :ISODate("2016-010125:090"),
+					reviewer:"Yabo",
+					text : "This is a text doc"
+				},
+				{
+					rating :0.6,
+					date :ISODate("2016-010125:090"),
+					reviewer:"hewabo",
+					text : "This is another text doc"
+				}]
+		}
+	}
+//////////////////////////////////
+
+updateMany() : 
+
+	// The difference between this and update one is that 
+	//udate many will update all doc's that match the filtering criteria
+	//whereas update one just modified the first result 
+
+	db.movieDetails.updateMany({
+		rated:null   // this will search for all doc's with rated field marked as null
+	},{
+		@unset : {   // this operation will delete all fields that are metnioned in the  breaces
+			rated:"" // as only rated field is mentioned here, only the rated field from the doc
+			         // will be deleted ( p.s the quotes are just to fulfill the syntactical critera ,
+			         // you can put anyting in the quotes , does not matter )
+			     }
+			 })
+
+
+//////////////////
+
+
+** Upserts // these are update oparations that are used to create new documents 
+
+ //They search for the document given the filter critera 
+ //If no doc is found , using the filter critera , a new doc is created 
+
+ db.movieDetails.updateOne({
+ 	"imdb.id":details.imdb.id
+ },{
+ 	$set:detail // this sets the detail document ( this is present elswhere ) if it's not already present 
+ },{            
+ 	upsert:true // this will add the movie entry if it does not exist , no duplicates will be added 
+ });
+
+ // let detail ={
+ // 	"title":"The martial",
+ // 	"year":2015,
+ // "rated":"PG-13"}
+
+ // }
+
+ ---------------------------
+** replaceOne()  --  //this is the 3rd and final update method of the mongoDb query 
+                     // language 
+
+ // As opposed to updateOne/ updateMany , this is used to directly replace a doc
+ // rathan than seraching using a filter critera 
+ detailsDoc= db.movieDetails.findOne("indb.id":"353434322"); // gives the 1st doc that matches 
+ // findOne returns a single document rathen than a cursor
+
+ // now we can directly manipulate that doument and add fields and values to it
+   detaliDoc.poster ;
+   detaliDoc.poster ="http//: poser web address"
+  
+  // and we can finally replace that document with 
+ db.movieDetails.replaceOne({
+ 	"imdb.id":detaliDoc.imdb.id // find the id of the detaliDoc and mathch it against all doc's 
+ },
+ detailsDoc // after you get the first doc mathcing the criteria , replace it with our detailDoc document
+ )          // or any other document we wish to replace with the seach critera doc 
+
+ --------------------------
+
+ ** deleting documents using deleteOne() and deleteMany()
+
+ db.reviews.deleteOne({_id:ObjectId("q4iu54j55j23l45")}); // this will delete
+                                                          // the first doc with given _id
+
+db.review.deleteMany({reviewer_id:3423423423}); // this will delete ALL
+                                                // documents wil the reviewer_id
+                                                // which matches that  given 
