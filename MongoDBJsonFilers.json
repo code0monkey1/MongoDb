@@ -1,3 +1,5 @@
+MongoDB ( Intro to MongoDB course )
+
 // equality filer 
 {'end station name': '2 Ave & E 31 St'} // this will search all end station names that have value 2 Ave & E 30 St
 {"birth year": {"$gte": 1985,"$lt": 1990}}
@@ -422,3 +424,4 @@ db.movieDetails.find({boxOffice : {$elemMatch:
 $regex // this operator can be used to match a certain field with a certain regex ..
 
 db.movieDetails.find({"awards.text":{$regex:"/^Won .*/"}}) // this will show all the documents that have awards.text field start with Won .. 
+---------------------------------------
