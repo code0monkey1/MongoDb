@@ -291,19 +291,19 @@ updateMany() :
  // findOne returns a single document rathen than a cursor
 
  // now we can directly manipulate that doument and add fields and values to it
-   detaliDoc.poster ;
-   detaliDoc.poster ="http//: poser web address"
-  
+ detaliDoc.poster ;
+ detaliDoc.poster ="http//: poser web address"
+
   // and we can finally replace that document with 
- db.movieDetails.replaceOne({
+  db.movieDetails.replaceOne({
  	"imdb.id":detaliDoc.imdb.id // find the id of the detaliDoc and mathch it against all doc's 
  },
  detailsDoc // after you get the first doc mathcing the criteria , replace it with our detailDoc document
  )          // or any other document we wish to replace with the seach critera doc 
 
- --------------------------
+  --------------------------
 
- ** deleting documents using deleteOne() and deleteMany()
+  ** deleting documents using deleteOne() and deleteMany()
 
  db.reviews.deleteOne({_id:ObjectId("q4iu54j55j23l45")}); // this will delete
                                                           // the first doc with given _id
@@ -311,3 +311,114 @@ updateMany() :
 db.review.deleteMany({reviewer_id:3423423423}); // this will delete ALL
                                                 // documents wil the reviewer_id
                                                 // which matches that  given 
+                                                ------------------------------------------------
+                                                MongoDB Query language
+///////////////////////
+https://docs.mongodb.com/manual/reference/operator/query-comparison/
+/////////////////////
+** comparison query operators
+                       // notation similar to equality filters 
+                       db.movieDetails.find{{runtime:{$gt:90,$lt:120}}},{_id:0 , title: 1, runtime:1});
+ // find all movie entries , whose runtime is greater than 90 and less then 120
+ // and only show (project ) the title and rutime of those moveis 
+
+db.movieDetails.find({runtime:{$gte:180}}, // look for all movie entires that have runtime greater than 180
+	"tomato.meter":{{$gte:95}} ,{_id: 0}, title: 1, runtime: 1 }) // and the tomato meter rating is 
+//////////
+
+** in operator // the values you put in the "in" operatior must be in an array 
+---------------                                                                  // greater than or equal to 95 
+                                                                  // show the title and runtime only 
+                                                                  db.movieDetails.find({rated:{$in: ["G","PG"]}},
+                                                                  	{_id: 0, title: 1, rated : 1})
+// here we find all movies that have rating as "G or "PG"
+// and we only project the title and rated fields 
+**$nin -- this does the opposite of in operator ( i.e shows all values that don't have the values mentioned for the given field )
+/////////
+
+-- $exists and $type ( these are used to filter fields according to if they exist in a record or not , or what type they belong to)
+///////////////////
+video.movies.find(mpaaRating:{$exists: false})
+// this filters and shows all doc's that do not have the field mpaaRating in the document
+
+video.movies.find({mpaaRating:{$type :"string"}})
+// this filters and shows all doc's that have the  mpaaRating data type as a string 
+
+--------------------------------------
+
+// logical operators in mongoDB
+
+-- $and / @or 
+ // the or operator takes an array of values for
+ // the different fields one is selecting for 
+ db.movieDetails.find({$or: [{"tomato.meter":{$gt: 95}},
+ 	{"metacritic":{$gt: 88}}]},
+ {_id : 0, title :1 ,
+ 	"tomato.meter":1,
+ "metacritic":1})
+
+ // in the previous query , one is selecting all directoires 
+ // that have tomato.meter field greater than 95
+ // or whose metacritic rating is greater then 88
+ // and finally project the title ,tomato.meter and metacirtic
+ ------------------------------
+
+ Q >As selectors in a filer are anded together implicityly ,
+ then why use the $and operator when you can simply filter out values like so : 
+
+
+ db.movieDetails.find({"metacritic":{@ne:null}, // this matches all values that have null , and the do'cs that don't have the key metacictic at all 
+ 	"metacritic":{@exists:true}}, // this checks if the field exists in the document 
+ 	{_id:0,title:1,"metacritic":1})
+
+})
+
+Ans > That is because Json doc's take unique keys , so a  paremeter and it's filering criter can be specified only once ,
+and evaluate based on that , so , if a key is specified twice in a selector query , only the last critera mentioned for the given key will be executed 
+So, a $and operator helps us in this aspect , as it allows us to use multiple constraints on the same field , and perform the filter likewise 
+
+Like so : 
+
+db.movieDetails.find($and :[{"metacritic":{$ne: null} },
+	{"metacritic":{$exists:true}}]}
+{_id:0, title: 1 ,"metacictic"1)
+
+//// So, the $and field is used to apply mutliple filtering critera on the same field 
+
+////////////////////////////////////////////////////
+// Logical filering Operations on array  types 
+////////////////////////////////////////////////////
+
+//*$all : this is used to ensure that all the values mentioned in 
+//the filering criteria are present in the array field being filered 
+//irrespective of the order in which they are present .
+
+db.movieDetails.find({genres: {$all : ["Comedy","Crime","Drama"]}},
+	{_id: 0, title: 1, genres:1})
+
+// This will show all entries that have comedy , 
+//crime and drama in the genres field 
+
+----------------
+(another array filering operator)
+//$size -- this is used to find all documents with
+// a field of type array and having an array size equal
+// to the size specified at query time 
+db.movieDetails.find({countries:{$size:1}})
+
+// this will show all doc's that have the countries filed array with size 1 
+---------------
+$elemMatch(another array filering oparation)
+
+// this is used to filter 1 single element in an array matching all criteria specified for it 
+
+eg : 
+db.movieDetails.find({boxOffice : {$elemMatch: 
+	{"country":"Germany","revenue":{$gt:17}}}}) 
+// In this query , it will search for all documents that have
+// the country as germany , and that element  itslef has the revenue field greaer than 17
+-----------------------------
+
+$regex // this operator can be used to match a certain field with a certain regex ..
+
+db.movieDetails.find({"awards.text":{$regex:"/^Won .*/"}}) // this will show all the documents that have awards.text field start with Won .. 
